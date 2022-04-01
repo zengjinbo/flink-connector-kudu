@@ -1,0 +1,2 @@
+com.psosuo.flink.kudu.table.KuduCatalogFactory
+com.psosuo.flink.kudu.table.KuduTableFactory
