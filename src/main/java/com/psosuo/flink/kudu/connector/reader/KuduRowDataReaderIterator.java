@@ -84,7 +84,9 @@ public class KuduRowDataReaderIterator {
         schema.getColumns().forEach(column -> {
             String name = column.getName();
             int pos = schema.getColumnIndex(name);
-
+            if (row.getObject(name)==null)
+                genericRowData.isNullAt(pos);
+            else
             genericRowData.setField(pos, dataTypeChageByFlink(row.getObject(name), column.getType()));
         });
         return genericRowData;
