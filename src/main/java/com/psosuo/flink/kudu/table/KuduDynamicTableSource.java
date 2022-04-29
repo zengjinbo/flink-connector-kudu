@@ -7,7 +7,7 @@ import com.psosuo.flink.kudu.connector.KuduTableInfo;
 import com.psosuo.flink.kudu.connector.reader.KuduReaderConfig;
 import com.psosuo.flink.kudu.options.LookupOptions;
 import org.apache.flink.api.common.io.InputFormat;
-import org.apache.flink.shaded.guava30.com.google.common.collect.Lists;
+import org.apache.flink.shaded.guava18.com.google.common.collect.Lists;
 import org.apache.flink.table.api.TableSchema;
 import org.apache.flink.table.connector.ChangelogMode;
 import org.apache.flink.table.connector.source.*;

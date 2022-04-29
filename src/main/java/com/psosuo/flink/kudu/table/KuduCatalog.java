@@ -42,7 +42,7 @@ import org.apache.flink.table.expressions.Expression;
 import org.apache.flink.table.factories.TableFactory;
 import org.apache.flink.util.StringUtils;
 
-import org.apache.flink.shaded.guava30.com.google.common.collect.Lists;
+import org.apache.flink.shaded.guava18.com.google.common.collect.Lists;
 
 import org.apache.kudu.ColumnSchema;
 import org.apache.kudu.client.AlterTableOptions;
