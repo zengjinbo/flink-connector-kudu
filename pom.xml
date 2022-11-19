@@ -4,20 +4,24 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 <modelVersion>4.0.0</modelVersion>
-
+    <parent>
+        <artifactId>flink-sql</artifactId>
+        <groupId>com.deepexi.flink</groupId>
+        <version>1.15</version>
+    </parent>
     <groupId>com.psosuo.flink</groupId>
-    <version>1.14.4</version>
+    <version>1.15.2</version>
 
     <artifactId>flink-connector-kudu</artifactId>
     <properties>
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
-        <flink.version>1.14.4</flink.version>
-        <scala.binary.version>2.11</scala.binary.version>
-        <scala.version>2.11</scala.version>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <flink.version>1.15.2</flink.version>
+        <scala.binary.version>2.12</scala.binary.version>
+        <scala.version>2.12</scala.version>
         <logback.version>1.2.3</logback.version>
         <hive.groupid>org.apache.hive</hive.groupid>
         <hive.version>3.1.2</hive.version>
@@ -35,7 +39,7 @@
     </dependency>-->
     <dependency>
         <groupId>org.apache.flink</groupId>
-        <artifactId>flink-streaming-java_${scala.version}</artifactId>
+        <artifactId>flink-streaming-java</artifactId>
         <version>${flink.version}</version>
         <scope>provided</scope>
     </dependency>
@@ -82,7 +86,7 @@
     </dependency>-->
     <dependency>
         <groupId>org.apache.flink</groupId>
-        <artifactId>flink-table-api-java-bridge_${scala.version}</artifactId>
+        <artifactId>flink-table-api-java-bridge</artifactId>
         <version>${flink.version}</version>
         <scope>provided</scope>
     </dependency>

@@ -3,6 +3,8 @@ package com.psosuo.flink.kudu.table;
 import com.psosuo.flink.kudu.batch.KuduOutputFormat;
 import com.psosuo.flink.kudu.connector.KuduTableInfo;
 import com.psosuo.flink.kudu.connector.writer.KuduWriterConfig;
+import com.psosuo.flink.kudu.options.KuduConnectorOptions;
+import org.apache.flink.configuration.ReadableConfig;
 import org.apache.flink.table.api.TableSchema;
 import org.apache.flink.table.connector.ChangelogMode;
 import org.apache.flink.table.connector.sink.DynamicTableSink;
@@ -13,11 +15,11 @@ import org.apache.flink.types.RowKind;
 import static org.apache.flink.util.Preconditions.checkState;
 
 public class KuduDynamicTableSink implements DynamicTableSink {
-    private final KuduWriterConfig.Builder writerConfigBuilder;
+    private final KuduWriterConfig writerConfigBuilder;
     private final transient TableSchema flinkSchema;
     private final transient KuduTableInfo tableInfo;
 
-    public KuduDynamicTableSink(KuduWriterConfig.Builder configBuilder, KuduTableInfo tableInfo, TableSchema flinkSchema) {
+    public KuduDynamicTableSink(KuduWriterConfig configBuilder, KuduTableInfo tableInfo, TableSchema flinkSchema) {
         this.writerConfigBuilder = configBuilder;
         this.tableInfo = tableInfo;
         this.flinkSchema = flinkSchema;
@@ -40,8 +42,8 @@ public class KuduDynamicTableSink implements DynamicTableSink {
 
     @Override
     public SinkRuntimeProvider getSinkRuntimeProvider(Context context) {
-        KuduOutputFormat<RowData> kuduOutputFormat =new KuduOutputFormat<>(writerConfigBuilder.build(),tableInfo, new UpsertDynamicOperationMapper(flinkSchema));
-        return  OutputFormatProvider.of(kuduOutputFormat);
+        KuduOutputFormat<RowData> kuduOutputFormat =new KuduOutputFormat<>(writerConfigBuilder,tableInfo, new UpsertDynamicOperationMapper(flinkSchema));
+        return  OutputFormatProvider.of(kuduOutputFormat, writerConfigBuilder.getParallelism());
     }
 
     @Override

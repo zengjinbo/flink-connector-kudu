@@ -22,6 +22,7 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import com.psosuo.flink.kudu.connector.KuduTableInfo;
 import com.psosuo.flink.kudu.connector.writer.KuduWriterConfig;
+import org.apache.flink.configuration.ReadableConfig;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSink;
 import org.apache.flink.table.api.TableSchema;
@@ -40,6 +41,7 @@ public class KuduTableSink implements UpsertStreamTableSink<Row> {
         this.writerConfigBuilder = configBuilder;
         this.tableInfo = tableInfo;
         this.flinkSchema = flinkSchema;
+
     }
 
     @Override

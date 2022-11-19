@@ -10,9 +10,11 @@ import org.apache.flink.api.common.io.InputFormat;
 import org.apache.flink.shaded.guava30.com.google.common.collect.Lists;
 import org.apache.flink.table.api.TableSchema;
 import org.apache.flink.table.connector.ChangelogMode;
+import org.apache.flink.table.connector.Projection;
 import org.apache.flink.table.connector.source.*;
 import org.apache.flink.table.connector.source.abilities.SupportsLimitPushDown;
 import org.apache.flink.table.connector.source.abilities.SupportsProjectionPushDown;
+import org.apache.flink.table.types.DataType;
 import org.apache.flink.table.utils.TableSchemaUtils;
 import org.apache.flink.util.Preconditions;
 import org.slf4j.Logger;
@@ -28,7 +30,7 @@ public class KuduDynamicTableSource implements DynamicTableSource,LookupTableSou
 
     private final KuduReaderConfig.Builder configBuilder;
     private final KuduTableInfo tableInfo;
-    private  TableSchema flinkSchema;
+    private DataType physicalRowDataType;
     private final String[] projectedFields;
     private long limit = -1;
 
@@ -40,31 +42,33 @@ public class KuduDynamicTableSource implements DynamicTableSource,LookupTableSou
     private KuduRowInputFormat kuduRowInputFormat;
 
     public KuduDynamicTableSource(KuduReaderConfig.Builder configBuilder, KuduTableInfo tableInfo,
-                           TableSchema flinkSchema, List<KuduFilterInfo> predicates, String[] projectedFields) {
+                                  DataType physicalRowDataType, List<KuduFilterInfo> predicates, String[] projectedFields) {
         this.configBuilder = configBuilder;
         this.tableInfo = tableInfo;
-        this.flinkSchema = flinkSchema;
+        this.physicalRowDataType = physicalRowDataType;
         this.predicates = predicates;
         this.projectedFields = projectedFields;
         if (predicates != null && predicates.size() != 0) {
             this.isFilterPushedDown = true;
         }
+
         this.kuduRowInputFormat = new KuduRowInputFormat(configBuilder.build(), tableInfo,
                 predicates == null ? Collections.emptyList() : predicates,
-                projectedFields == null ? Lists.newArrayList(flinkSchema.getFieldNames()) : Lists.newArrayList(projectedFields));
+                projectedFields == null ? Lists.newArrayList(DataType.getFieldNames(physicalRowDataType)) : Lists.newArrayList(projectedFields));
     }
     @Override
     public LookupRuntimeProvider getLookupRuntimeProvider(LookupContext lookupContext) {
         LookupOptions build = LookupOptions.builder().build();
+
         String[] keyNames = new String[lookupContext.getKeys().length];
         for (int i = 0; i < keyNames.length; i++) {
             int[] innerKeyArr = lookupContext.getKeys()[i];
             Preconditions.checkArgument(innerKeyArr.length == 1,
                     "kudu only support non-nested look up keys");
-            keyNames[i] = flinkSchema.getFieldNames()[innerKeyArr[0]];
+            keyNames[i] =  DataType.getFieldNames(physicalRowDataType).get(innerKeyArr[0]);
         }
         KuduDynamicLookupFunction kuduDynamicLookupFunction = new KuduDynamicLookupFunction(build, configBuilder, tableInfo,
-                projectedFields == null ? flinkSchema.getFieldNames() : projectedFields, keyNames
+                projectedFields == null ? DataType.getFieldNames(physicalRowDataType).toArray(new String[0]) : projectedFields, keyNames
         );
         return TableFunctionProvider.of(kuduDynamicLookupFunction);
     }
@@ -82,13 +86,13 @@ public class KuduDynamicTableSource implements DynamicTableSource,LookupTableSou
         }
         InputFormat inputFormat = new KuduRowDataInputFormat(configBuilder.build(), tableInfo,
                 predicates == null ? Collections.emptyList() : predicates,
-                projectedFields == null ?  Lists.newArrayList(flinkSchema.getFieldNames()) : Lists.newArrayList(projectedFields));
+                projectedFields == null ?  Lists.newArrayList(DataType.getFieldNames(physicalRowDataType)) : Lists.newArrayList(projectedFields));
         return InputFormatProvider.of(inputFormat);
     }
 
     @Override
     public DynamicTableSource copy() {
-        return new KuduDynamicTableSource(configBuilder, tableInfo, flinkSchema, null, projectedFields);
+        return new KuduDynamicTableSource(configBuilder, tableInfo, physicalRowDataType, null, projectedFields);
     }
 
     @Override
@@ -110,8 +114,8 @@ public class KuduDynamicTableSource implements DynamicTableSource,LookupTableSou
 
     @Override
     public void applyProjection(int[][] projectedFields) {
-        this.flinkSchema = TableSchemaUtils.projectSchema(flinkSchema, projectedFields);
-
+       // this.flinkSchema = TableSchemaUtils.projectSchema(flinkSchema, projectedFields);
+        this.physicalRowDataType = Projection.of(projectedFields).project(physicalRowDataType);
     }
 
 

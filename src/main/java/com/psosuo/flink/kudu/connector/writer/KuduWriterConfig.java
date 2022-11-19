@@ -17,6 +17,7 @@
 package com.psosuo.flink.kudu.connector.writer;
 
 import com.psosuo.flink.kudu.batch.KuduOutputFormat;
+import com.psosuo.flink.kudu.options.KuduConnectorOptions;
 import com.psosuo.flink.kudu.streaming.KuduSink;
 import org.apache.flink.annotation.PublicEvolving;
 
@@ -37,15 +38,21 @@ public class KuduWriterConfig implements Serializable {
     private final String masters;
     private final FlushMode flushMode;
     private final Long timeoutMs;
-
+    private final Long sinkBufferFlushMaxRows;
+    private final Long flushInterval;
+    private final Integer parallelism;
     private KuduWriterConfig(
             String masters,
             FlushMode flushMode,
-            Long timeoutMs) {
+            Long timeoutMs,Long sinkBufferFlushMaxRows,Long flushInterval,Integer parallelism) {
 
         this.masters = checkNotNull(masters, "Kudu masters cannot be null");
         this.flushMode = checkNotNull(flushMode, "Kudu flush mode cannot be null");
         this.timeoutMs = timeoutMs;
+        this.sinkBufferFlushMaxRows=sinkBufferFlushMaxRows;
+        this.flushInterval=flushInterval;
+        this.parallelism=parallelism;
+
     }
 
     public String getMasters() {
@@ -58,6 +65,16 @@ public class KuduWriterConfig implements Serializable {
 
     public Long getTimeoutMs() {
         return timeoutMs;
+    }
+
+    public Long getSinkBufferFlushMaxRows() {
+        return sinkBufferFlushMaxRows;
+    }
+    public Integer getParallelism() {
+        return parallelism;
+    }
+    public Long getFlushInterval() {
+        return flushInterval;
     }
 
     @Override
@@ -76,6 +93,9 @@ public class KuduWriterConfig implements Serializable {
         private String masters;
         private FlushMode flushMode = FlushMode.AUTO_FLUSH_BACKGROUND;
         private Long timeoutMs;
+        private Integer parallelism;
+        private  Long sinkBufferFlushMaxRows;
+        private  Long flushInterval;
 
         private Builder(String masters) {
             this.masters = masters;
@@ -94,6 +114,19 @@ public class KuduWriterConfig implements Serializable {
             this.timeoutMs = timeoutMs;
             return this;
         }
+        public Builder setParallelism(Integer parallelism) {
+            this.parallelism = parallelism;
+            return this;
+        }
+        public Builder setSinkBufferFlushMaxRows(long sinkBufferFlushMaxRows) {
+            this.sinkBufferFlushMaxRows = sinkBufferFlushMaxRows;
+            return this;
+        }
+
+        public Builder setFlushInterval(Long flushInterval) {
+            this.flushInterval = flushInterval;
+            return this;
+        }
 
         public Builder setEventualConsistency() {
             return setConsistency(FlushMode.AUTO_FLUSH_BACKGROUND);
@@ -107,7 +140,7 @@ public class KuduWriterConfig implements Serializable {
             return new KuduWriterConfig(
                     masters,
                     flushMode,
-                    timeoutMs);
+                    timeoutMs,sinkBufferFlushMaxRows,flushInterval,parallelism);
         }
     }
 }
