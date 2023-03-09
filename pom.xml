@@ -10,7 +10,7 @@
         <version>1.15</version>
     </parent>
     <groupId>com.psosuo.flink</groupId>
-    <version>1.15.2</version>
+    <version>1.16.1</version>
 
     <artifactId>flink-connector-kudu</artifactId>
     <properties>
@@ -19,7 +19,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <flink.version>1.15.2</flink.version>
+        <flink.version>1.16.1</flink.version>
         <scala.binary.version>2.12</scala.binary.version>
         <scala.version>2.12</scala.version>
         <logback.version>1.2.3</logback.version>
